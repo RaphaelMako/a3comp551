@@ -4,7 +4,7 @@ import numpy as np
 def parseForSubmission(number, letter):
   result = ""
   for i in range(10):
-    if (i == 9 - number):
+    if (i == number):
       result += "1"
     else:
       result += "0"
@@ -17,7 +17,7 @@ def parseForSubmission(number, letter):
     letter_position = ord(letter) - ord("A")
 
   for i in range(26):
-    if (i == 25 - letter_position):
+    if (i == letter_position):
       result += "1"
     else:
       result += "0"
