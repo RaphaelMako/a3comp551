@@ -14,6 +14,8 @@ import torch
 def __loss_batch(model, loss_func, xb, yb, opt=None):
     
     # Make predictions and get loss
+    yb = yb.long()
+    xb = xb.double()
     loss = loss_func(model(xb), yb)
 
     # Backpropagate if an optimizer is specified
@@ -28,13 +30,10 @@ def __loss_batch(model, loss_func, xb, yb, opt=None):
 # Fit an arbitrary model
 def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
 
-    model = model.double()
-
     for epoch in range(epochs):
         
         model.train() # Put model in training mode
         for xb, yb in train_dl: # cycle through samples in training batch
-            print(xb.dtype)
             __loss_batch(model, loss_func, xb, yb, opt)
 
         model.eval() # Put the model in evaluation mode

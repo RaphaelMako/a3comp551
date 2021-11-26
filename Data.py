@@ -9,11 +9,33 @@ with open("data/labels_l.pkl", 'rb') as f: labels = pickle.load(f)
 with open("data/images_ul.pkl", 'rb') as f: unlabeled_images = pickle.load(f)
 with open("data/images_test.pkl", 'rb') as f: images_test = pickle.load(f)
 
-
-###
-# Below are helper functions for manupulating / transforming the labels in the MNIST dataset...
-###
 import numpy as np
+
+label_dict = {}
+for letter in range(0, 26):
+    for number in range(0, 10):
+        label = str(number) + chr(65 + letter)
+        label_dict[letter*10 + number] = label
+
+# Get the unique integer for a given label (used by the pytorch CNN architecture.)
+def label_to_int(label):
+    key_list = list(label_dict.keys())
+    value_list = list(label_dict.values())
+    key_index = value_list.index(label)
+    return key_list[key_index]
+
+# Get the label that corresponds with the given integer (must be between 0 and 259 inclusive.)
+def int_to_label(int):
+    return label_dict[int]
+
+# The dataset of labels, as unique integers (i.e., size == 30,000)
+def integer_labels():
+    return arrmap(label_to_int, arrmap(binary_to_nl, labels))
+
+# Shortcut function that maps a numpy array to a numpy array using the given lambda (fn.)
+# I didn't want to keep writing this, though there is probably a better way to implement it... :/
+def arrmap(fn, arr: np.array):
+    return np.array(list(map(fn, arr)))
 # Shortcut function that maps a numpy array to a numpy array using the given lambda (fn.)
 # I didn't want to keep writing this, though there is probably a better way to implement it... :/
 def arrmap(fn, arr: np.array):
