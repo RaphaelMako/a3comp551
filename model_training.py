@@ -1,4 +1,5 @@
-import torch, datetime, sams_plotting as splot
+import torch, sams_plotting as splot
+from datetime import datetime
 
 # calculate model accuracy
 def get_accuracy(model, data_loader, device):
