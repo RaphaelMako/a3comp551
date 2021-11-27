@@ -1,4 +1,3 @@
-
 ###
 ## This file loads all our project data for reference.
 ###
@@ -10,12 +9,48 @@ with open("data/images_ul.pkl", 'rb') as f: unlabeled_images = pickle.load(f)
 with open("data/images_test.pkl", 'rb') as f: images_test = pickle.load(f)
 
 import numpy as np
-
 label_dict = {}
 for letter in range(0, 26):
     for number in range(0, 10):
         label = str(number) + chr(65 + letter)
         label_dict[letter*10 + number] = label
+
+import random
+
+# Rotate the images...
+rotated_images = []
+rotated_image_labels = []
+for img in labeled_images:
+
+    # No rotation
+    rotated_images.append(img)
+    rotated_image_labels.append(0)
+
+    # 90 degrees
+    img_rot_90 = np.rot90(img)
+    rotated_images.append(img_rot_90)
+    rotated_image_labels.append(1)
+
+    # 180 degrees
+    img_rot_180 = np.rot90(img_rot_90)
+    rotated_images.append(img_rot_180)
+    rotated_image_labels.append(2)
+    
+    # 270 degrees
+    img_rot_270 = np.rot90(img_rot_180)
+    rotated_images.append(img_rot_270)
+    rotated_image_labels.append(3)
+
+# Shuffle the rotated images...
+rotated_images = list(zip(rotated_images, rotated_image_labels))
+random.shuffle(rotated_images)
+rotated_images, rotated_image_labels = zip(*rotated_images)
+rotated_images = np.array(list(rotated_images)) # Turn into lists, not tuples!
+rotated_image_labels = np.array(list(rotated_image_labels))
+
+###
+## Helper functions below...
+###
 
 # Get the unique integer for a given label (used by the pytorch CNN architecture.)
 def label_to_int(label):
@@ -32,10 +67,6 @@ def int_to_label(int):
 def integer_labels():
     return arrmap(label_to_int, arrmap(binary_to_nl, labels))
 
-# Shortcut function that maps a numpy array to a numpy array using the given lambda (fn.)
-# I didn't want to keep writing this, though there is probably a better way to implement it... :/
-def arrmap(fn, arr: np.array):
-    return np.array(list(map(fn, arr)))
 # Shortcut function that maps a numpy array to a numpy array using the given lambda (fn.)
 # I didn't want to keep writing this, though there is probably a better way to implement it... :/
 def arrmap(fn, arr: np.array):
@@ -77,3 +108,12 @@ def int_to_nl(int_label):
 # Converts binary to integer labels
 def labels_as_unique_integers():
     return arrmap(nl_to_int, arrmap(binary_to_nl, labels))
+
+def split_train_and_val(data: np.array, split_index: int):
+    '''
+    Splits a dataset into training and validation sets, where the training set is all indices that come before
+    the split point, and the validation set is all that come after.
+    '''
+    train = data[0:split_index]
+    val = data[split_index:]
+    return train, val
